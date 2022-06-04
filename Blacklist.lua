@@ -1,4 +1,4 @@
-local blacklist = {"RainbowJulieee","FelixDM"}
+local blacklist = {"RainbowJulieee"}
 
 function check()
 	if table.find(blacklist, game:GetService("Players").LocalPlayer.Name) then 
