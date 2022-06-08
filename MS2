@@ -2,6 +2,7 @@ _G.ESP = false
 _G.Manual = false
 _G.oreFarm = false
 _G.Egg = "Basic Egg"
+_G.tripleHatch = false
 _G.openEgg = false
 
 
@@ -41,73 +42,69 @@ mainTab:Toggle{
 	Description = nil,
 	Callback = function(state)
         _G.ESP = state
-    end
-}
-
-spawn(function()
-    local BillboardGui = Instance.new("BillboardGui")
-    local TextLabel = Instance.new("TextLabel")
-    
-    BillboardGui.Name = "esper"
-    BillboardGui.Active = true
-    BillboardGui.AlwaysOnTop = true
-    BillboardGui.LightInfluence = 1
-    BillboardGui.MaxDistance = 100
-    BillboardGui.Size = UDim2.new(5, 0, 5, 0)
-            
-    TextLabel.BackgroundTransparency = 1
-    TextLabel.BorderSizePixel = 0
-    TextLabel.Size = UDim2.new(1, 0, 1, 0)
-    TextLabel.Font = Enum.Font.SourceSans
-    TextLabel.Text = "Bug"
-    TextLabel.TextScaled = true
-    TextLabel.TextSize = 12
-    TextLabel.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-    TextLabel.TextStrokeTransparency = 0
-    TextLabel.TextWrapped = true
-    while task.wait() do
         if _G.ESP then
-            for i,v in pairs(workspace.Decoration:GetChildren()) do
-                pcall(function()
-                    if v:FindFirstChild("esper") == nil then
-                        local a = BillboardGui:Clone()
-                        local b = TextLabel:Clone()
-                        a.Adornee = v
-                        b.Text = v.Name
-                        b.TextColor3 = v.Color
-                        b.Parent = a
-                        a.Parent = v
-                    end
-                end)
-            end
-            for i,v in pairs(workspace.Chests:GetChildren()) do
-                pcall(function()
-                    if v.PrimaryPart:FindFirstChild("esper") == nil then
-                        local a = BillboardGui:Clone()
-                        local b = TextLabel:Clone()
-                        a.Adornee = v.PrimaryPart
-                        b.Text = v.Name .. " Chest"
-                        b.TextColor3 = v:WaitForChild("Visual",math.huge):FindFirstChildWhichIsA("MeshPart").Color
-                        b.Parent = a
-                        a.Parent = v.PrimaryPart
-                    end
-                end)
-            end
-        else
-            for i,v in pairs(workspace.Decoration:GetChildren()) do
-                pcall(function()
-                    v.esper:Destroy()
-                end)
-            end
+            local BillboardGui = Instance.new("BillboardGui")
+            local TextLabel = Instance.new("TextLabel")
             
-            for i,v in pairs(workspace.Chests:GetChildren()) do
-                pcall(function()
-                    v.PrimaryPart.esper:Destroy()
-                end)
+            BillboardGui.Name = "esper"
+            BillboardGui.Active = true
+            BillboardGui.AlwaysOnTop = true
+            BillboardGui.LightInfluence = 1
+            BillboardGui.MaxDistance = 100
+            BillboardGui.Size = UDim2.new(5, 0, 5, 0)
+                    
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.BorderSizePixel = 0
+            TextLabel.Size = UDim2.new(1, 0, 1, 0)
+            TextLabel.Font = Enum.Font.SourceSans
+            TextLabel.Text = "Bug"
+            TextLabel.TextScaled = true
+            TextLabel.TextSize = 12
+            TextLabel.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+            TextLabel.TextStrokeTransparency = 0
+            TextLabel.TextWrapped = true
+            while _G.ESP and task.wait() do
+                for i,v in pairs(workspace.Decoration:GetChildren()) do
+                    pcall(function()
+                        if v:FindFirstChild("esper") == nil then
+                            local a = BillboardGui:Clone()
+                            local b = TextLabel:Clone()
+                            a.Adornee = v
+                            b.Text = v.Name
+                            b.TextColor3 = v.Color
+                            b.Parent = a
+                            a.Parent = v
+                        end
+                    end)
+                end
+                for i,v in pairs(workspace.Chests:GetChildren()) do
+                    pcall(function()
+                        if v.PrimaryPart:FindFirstChild("esper") == nil then
+                            local a = BillboardGui:Clone()
+                            local b = TextLabel:Clone()
+                            a.Adornee = v.PrimaryPart
+                            b.Text = v.Name .. " Chest"
+                            b.TextColor3 = v:WaitForChild("Visual",math.huge):FindFirstChildWhichIsA("MeshPart").Color
+                            b.Parent = a
+                            a.Parent = v.PrimaryPart
+                        end
+                    end)
+                end
             end
         end
+        for i,v in pairs(workspace.Decoration:GetChildren()) do
+            pcall(function()
+                v.esper:Destroy()
+            end)
+        end
+        
+        for i,v in pairs(workspace.Chests:GetChildren()) do
+            pcall(function()
+                v.PrimaryPart.esper:Destroy()
+            end)
+        end
     end
-end)
+}
 
 mainTab:Toggle{
 	Name = "Manual",
@@ -124,12 +121,7 @@ mainTab:Toggle{
 	Description = "Farm ores around you",
 	Callback = function(state)
         _G.oreFarm = state
-    end
-}
-
-spawn(function()
-    while task.wait() do
-        if _G.oreFarm then
+        while _G.oreFarm and task.wait() do
             pcall(function()
                 local Parts = workspace:GetPartBoundsInRadius(player.Character.PrimaryPart.Position, RegionSize, Params)
                 local foundOre = false
@@ -150,7 +142,12 @@ spawn(function()
             end)
         end
     end
-end)
+}
+
+local eggTab = GUI:Tab{
+	Name = "Egg",
+	Icon = "rbxassetid://9846818396"
+}
 
 local eggs = {}
 for i,v in pairs(loadModule("Eggs")) do
@@ -162,7 +159,7 @@ table.sort(eggs,function(eggA,eggB)
     return loadModule("Eggs")[eggA].Cost[2] < loadModule("Eggs")[eggB].Cost[2]
 end)
 
-mainTab:Dropdown{
+eggTab:Dropdown{
 	Name = "Choose Egg",
 	StartingText = _G.Egg,
 	Description = nil,
@@ -172,20 +169,24 @@ mainTab:Dropdown{
     end
 }
 
-mainTab:Toggle{
+eggTab:Toggle{
+    Name = "x3 Hatch",
+    StartingState = _G.tripleHatch,
+    Description = nil,
+    Callback = function(state)
+        _G.tripleHatch = state 
+    end
+}
+
+eggTab:Toggle{
 	Name = "Open Egg",
 	StartingState = _G.openEgg,
 	Description = nil,
 	Callback = function(state)
         _G.openEgg = state
-    end
-}
-
-spawn(function()
-    while task.wait() do
-        if _G.openEgg then
-            OpenEgg:FireServer(_G.Egg)
+        while _G.openEgg do
+            OpenEgg:FireServer(_G.Egg,_G.tripleHatch)
             task.wait(2)
         end
     end
-end)
+}
