@@ -151,9 +151,7 @@ local eggTab = GUI:Tab{
 
 local eggs = {}
 for i,v in pairs(loadModule("Eggs")) do
-    if v.Cost[1] == "Coins" then
-        table.insert(eggs,i)
-    end
+    table.insert(eggs,i)
 end
 table.sort(eggs,function(eggA,eggB)
     return loadModule("Eggs")[eggA].Cost[2] < loadModule("Eggs")[eggB].Cost[2]
