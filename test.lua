@@ -1,1 +1,4 @@
-print("haha")
+{
+  "ha",
+"noob"
+}
